@@ -1,0 +1,305 @@
+ Pulse
+Predictive maintenance that turns early warnings into safe, actionable maintenance
+The idea in 30 seconds
+Pulse monitors industrial equipment, learns how each machine actually operates, and detects early degradation before failure.
+Unlike systems that stop at an anomaly alert, Pulse explains the evidence, asks an experienced technician to validate it, checks whether the plant is ready for maintenance, and prepares a review-ready work order with the required parts, people, isolation, permits, and maintenance window.
+Pulse detects the problem early and helps the team act on it safely.
+The problem
+Manufacturing plants collect large amounts of temperature, pressure, vibration, flow, and equipment-status data. Predictive-maintenance systems can identify abnormal behaviour, but their alerts often fail to become timely maintenance action.
+There are four reasons.
+1. Equipment does not always operate at manual values
+A manual may list normal pressure as 7 bar, while a particular machine has safely operated around 9 bar for months because of the actual process configuration.
+A static threshold can therefore:
+Raise repeated false alarms at 9 bar
+Miss a meaningful drop from 9 bar to 7 bar
+Miss slow degradation that remains below the design limit
+Pulse learns the normal operating behaviour of each asset while continuing to respect approved safety limits.
+2. An alert does not explain what is happening
+“Pump P-101A: high vibration” is not enough.
+The technician needs to know:
+What changed?
+How quickly is it changing?
+Which signals support the alert?
+Is it likely to be equipment degradation, a process change, or a faulty sensor?
+Has a similar pattern appeared before?
+How long can the equipment continue operating?
+3. Field expertise is missing from the model
+Experienced operators often recognize a machine problem from sound, smell, vibration, process behaviour, or knowledge of a recent operating change.
+Pulse should not overrule that experience. It should combine model evidence with technician observations and let the technician confirm, correct, or reject the diagnosis.
+4. Prediction does not automatically produce action
+Even a correct prediction still requires:
+A clear maintenance scope
+The correct spare part and tools
+A qualified technician
+A production window
+Isolation and stored-energy checks
+Permit requirements
+Awareness of other work in the area
+Testing and return-to-service steps
+Without this planning, an alert becomes another item in the backlog.
+Proposed solution
+Pulse is a human-in-the-loop predictive-maintenance copilot.
+Its workflow is:
+Detect → Explain → Validate → Plan → Act → Learn
+1. Detect degradation against the real operating baseline
+Pulse consumes live or simulated sensor data such as:
+Vibration
+Temperature
+Pressure
+Flow rate
+Motor current
+Equipment state
+It learns the normal range and behaviour of each asset under different operating conditions.
+Pulse looks for:
+Sudden deviations
+Slow drift
+Unusual combinations of signals
+Change in the relationship between variables
+Behaviour that differs from similar operating cycles
+It distinguishes three boundaries:
+Boundary
+Meaning
+Design limit
+Approved operating or safety limit from engineering documents
+Learned baseline
+How this specific asset normally behaves in the field
+Current condition
+What the asset is doing now
+
+This lets Pulse detect behavioural change before the equipment reaches a critical limit.
+2. Explain the alert with evidence
+Pulse produces a concise explanation instead of a generic alarm:
+“Drive-end vibration on P-101A has increased by 31% over five days. Motor current and bearing temperature are also rising under comparable load. The pattern differs from this pump’s six-month operating baseline and resembles two previous bearing-wear cases. The pressure remains within the approved safety limit.”
+The explanation includes:
+Signals that changed
+Time and rate of change
+Comparison with the asset’s baseline
+Relevant design or safety limits
+Similar maintenance history
+Possible failure modes
+Confidence and uncertainty
+Missing evidence
+RAG grounds document-based information in manuals, SOPs, and previous maintenance records. Sensor conclusions come from structured time-series analysis, not from the language model guessing numerical trends.
+3. Ask the technician to validate the diagnosis
+The technician can respond using text, voice, or a simple form:
+Confirm the suspected issue
+Correct the failure mode
+Add an observation such as unusual noise or leakage
+Explain a recent process change
+Mark the alert as a sensor problem
+Request an inspection before repair
+Example:
+“The sound is coming from the drive-end bearing. This started after the last product change. Inspect alignment before replacing the bearing.”
+Pulse adds this observation to the case and preserves who provided it. The technician’s feedback also improves future alerts and maintenance history.
+4. Assess the impact of the intervention
+Once the issue is validated, Pulse checks whether the proposed maintenance action is practical and safe.
+It considers:
+Standby-equipment availability
+Upstream and downstream dependencies
+Shared isolation points
+Active permits and nearby work
+Degraded safeguards
+Parts and tools
+Technician skills and availability
+Production schedule
+Time required for isolation, repair, testing, and reinstatement
+This is a lightweight dependency check, not a full plant simulation.
+Pulse can compare options:
+Option
+Benefit
+Constraint
+Stop immediately
+Lowest equipment-failure exposure
+Standby pump unavailable
+Reduce load and repair at 18:00
+Preserves production until standby returns
+Requires enhanced monitoring
+Repair tomorrow
+Best staffing availability
+Longer degradation exposure
+
+The maintenance planner or supervisor selects the option.
+5. Prepare a review-ready work order
+Pulse drafts:
+Asset and failure description
+Recommended maintenance task
+Evidence and technician observations
+Priority and target completion time
+Required skills and estimated effort
+Parts, tools, and materials
+Suggested maintenance window
+Candidate isolation and stored-energy checks
+Suggested permit and PPE requirements
+Conflicts with other work
+Inspection and acceptance criteria
+Testing and return-to-service steps
+Required approvals
+Pulse prepares the work. Authorized people review and approve it.
+6. Learn from the outcome
+When the job is completed, the technician records:
+What was actually found
+What action was performed
+Parts consumed
+Whether the original prediction was correct
+Whether the asset returned to normal behaviour
+Pulse uses this outcome to improve the asset baseline, alert confidence, similar-case retrieval, and future maintenance recommendations.
+Safety boundary
+Pulse assists with detection, explanation, planning, and documentation. It does not take safety-critical control.
+A technician validates the diagnosis.
+An authorized specialist reviews isolation requirements.
+Authorized personnel physically apply locks and tags.
+A competent person verifies isolation and safe conditions.
+The responsible authority approves the permit.
+Pulse does not operate valves, breakers, or process controls.
+The hackathon demo
+Scenario
+Pump P-101A normally operates around 9 bar, although an old reference document lists 7 bar as a nominal value.
+Over five simulated days:
+Drive-end vibration rises gradually.
+Bearing temperature increases.
+Motor current becomes less stable.
+Pressure remains around the usual 9 bar.
+Demo flow
+Sensor data streams into Pulse.
+Pulse learns that 9 bar is normal for this asset, so it does not raise a false pressure alarm.
+Pulse detects the combined vibration, temperature, and current trend.
+It shows the evidence and suggests bearing degradation or misalignment.
+The technician adds: “The drive-end bearing sounds rough; check alignment first.”
+Pulse checks the proposed maintenance action.
+It finds that the standby pump is unavailable until 17:00 and nearby hot work ends at 16:30.
+Pulse compares immediate shutdown with reduced-load operation until an 18:00 window.
+The planner selects 18:00.
+Pulse generates a review-ready work order with parts, skills, checks, and approvals.
+The technician closes the job with the actual finding, completing the learning loop.
+The wow factor
+The demonstration contains three memorable moments:
+It understands actual field behaviour
+Pulse knows that 9 bar is normal for this pump even though a document says 7 bar.
+It combines AI with technician expertise
+The system finds the trend, but the technician contributes the field diagnosis and can correct the AI.
+It goes from prediction to safe action
+Pulse does not stop at “the pump may fail.” It identifies a practical intervention window and prepares the maintenance work.
+Predictive maintenance tells the team that a machine may fail. Pulse helps them understand it, validate it, and act before it fails.
+Why this is stronger than a standard predictive-maintenance project
+Standard project
+Pulse
+Uses one static threshold
+Learns asset-specific operating behaviour
+Shows an anomaly score
+Explains the changing signals and evidence
+Treats AI as the expert
+Combines AI with technician judgment
+Stops at an alert
+Assesses maintenance readiness
+Creates a vague ticket
+Drafts a complete work order
+Does not learn from the repair
+Captures actual findings and outcomes
+
+Hackathon alignment
+Track: Manufacturing — Intelligent Operations & Industrial Efficiency
+Theme direction
+Pulse alignment
+Predictive maintenance
+Detects early equipment degradation
+Operational copilots
+Supports technicians and maintenance planners
+Production optimization
+Finds a suitable maintenance window
+Reliability
+Converts early warning into planned intervention
+Meaningful insights
+Explains why the asset is abnormal
+Meaningful action
+Produces a review-ready work order
+Waste reduction
+Reduces false alarms, emergency repairs, and unnecessary maintenance
+
+Google Cloud implementation
+Component
+Google Cloud service
+Purpose
+Sensor events
+Pub/Sub
+Stream simulated equipment readings
+Stream processing
+Dataflow or Cloud Run
+Clean readings and calculate rolling features
+Operational history
+BigQuery
+Store time-series data and asset baselines
+Predictive model
+Vertex AI
+Anomaly detection or degradation scoring
+Document retrieval
+Vertex AI Search / RAG
+Retrieve manuals, SOPs, and maintenance history
+AI copilot
+Gemini on Vertex AI
+Explain evidence and structure technician feedback
+Planning engine
+Cloud Run
+Check dependencies, resources, and intervention options
+Context data
+Firestore or BigQuery
+Store assets, parts, people, permits, and relationships
+User interface
+Cloud Run web app
+Display health, evidence, options, and work order
+
+MVP scope
+Build one complete scenario with:
+Two duty/standby pumps
+Five sensor streams
+One injected degradation pattern
+One operating-baseline mismatch
+One manual and two procedures
+Three historical maintenance cases
+Two technician observations
+One parts inventory
+Two active work or permit records
+One generated work order
+Depth is more important than the number of assets.
+Three-day execution plan
+Day 1 — Data and detection
+Finalize the pump-degradation scenario and generate normal and failing sensor data.
+Define the assets, operating baseline, parts, technicians, and maintenance history.
+Stream sensor events through Pub/Sub and store them in BigQuery.
+Implement baseline comparison and anomaly scoring.
+Day 2 — AI explanation and maintenance planning
+Load the manual, procedures, and historical maintenance cases into the retrieval layer.
+Generate evidence-grounded alert explanations.
+Add technician confirmation, correction, and field observations.
+Implement checks for standby equipment, parts, schedules, permits, and work conflicts.
+Generate intervention options and the draft work order.
+Day 3 — Integration and demo
+Build the dashboard for asset health, evidence, technician validation, options, and work order.
+Run and test the complete detect-to-action flow.
+Test a false alarm and a missing-data case.
+Polish the three-minute demonstration and architecture diagram.
+Record a backup video and complete the submission.
+Suggested two-person split
+Person 1 — Data, detection, and backend
+Sensor-data generator
+Pub/Sub and BigQuery
+Baseline and anomaly model
+Planning rules and Cloud Run APIs
+Person 2 — AI and product experience
+RAG and alert explanations
+Technician-feedback flow
+Work-order generation
+Dashboard and demo story
+What we will not build
+A full industrial simulation platform
+Automatic permit approval
+Automatic physical isolation
+Real control-system integration
+A generic chatbot over manuals
+Several shallow equipment scenarios
+A complex model requiring unavailable real-world failure data
+Research basis
+Hazardous-energy control requires documented procedures, authorized personnel, and verification before maintenance begins: OSHA 1910.147
+Isolation planning must account for job scope, energy sources, isolation points, residual energy, responsibility, and changing conditions: Isolation Management in the Permit to Work Process
+Human-in-the-loop industrial AI should combine operator judgment with machine assistance: Human-in-the-loop and large language models in smart manufacturing
+Effective predictive maintenance depends on field observations, work history, planning, scheduling, and execution readiness: Predictive Maintenance Implementation
+

@@ -1,0 +1,14 @@
+{
+  "name": "pulse-maintenance",
+  "private": true,
+  "workspaces": ["apps/web"],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "npm run dev --workspace @pulse/web",
+    "dev:api": "mvn -s .mvn/settings.xml -f services/api/pom.xml spring-boot:run",
+    "build": "npm run build --workspace @pulse/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

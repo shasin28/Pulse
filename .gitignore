@@ -1,0 +1,12 @@
+node_modules/
+**/node_modules/
+
+.idea/
+.DS_Store
+
+services/api/target/
+apps/web/tsconfig.tsbuildinfo
+dist/
+**/dist/
+
+*.log
