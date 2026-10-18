@@ -16,9 +16,13 @@ public class ScenarioController {
 
     private final List<TechnicianValidation> validations = new ArrayList<>();
     private final List<WorkOrder> workOrders;
-    private final AtomicInteger nextWorkOrder = new AtomicInteger(2482);
+    private final AtomicInteger nextWorkOrder = new AtomicInteger(2481);
+    private final GeminiService geminiService;
+    private final FirestorePersistence firestorePersistence;
 
-    public ScenarioController() {
+    public ScenarioController(GeminiService geminiService, FirestorePersistence firestorePersistence) {
+        this.geminiService = geminiService;
+        this.firestorePersistence = firestorePersistence;
         workOrders = new ArrayList<>(List.of(
             new WorkOrder("WO-2479", "P-101B", "Valve seat replacement — isolation valve IV-201",
                 "scheduled", "Today · 09:00", "VLV-201-SEAT", 1, "Mechanical", 3.0,
@@ -58,8 +62,8 @@ public class ScenarioController {
                         new Asset("P-201A", "Secondary cooling pump", "Utilities · East", "HEALTHY", 19, 98.6, "2026-02-08", "Maya Chen")
                 ),
                 primaryAlert(),
-                List.copyOf(validations),
-                List.copyOf(workOrders)
+                firestorePersistence.listValidations(validations),
+                firestorePersistence.listWorkOrders(workOrders)
         );
     }
 
@@ -109,16 +113,17 @@ public class ScenarioController {
     @PostMapping("/alerts/P-101A/validation")
     public TechnicianValidation validate(@Valid @RequestBody ValidationRequest request) {
         TechnicianValidation validation = new TechnicianValidation(
-                "VAL-" + (validations.size() + 1), "ALT-1042",
+            "VAL-" + UUID.randomUUID(), "ALT-1042",
                 request.technician(), request.diagnosis(),
                 request.observation(), request.action(), Instant.now());
         validations.add(validation);
+        firestorePersistence.saveValidation(validation);
         return validation;
     }
 
     @GetMapping("/work-orders")
     public List<WorkOrder> listWorkOrders() {
-        return List.copyOf(workOrders);
+        return firestorePersistence.listWorkOrders(workOrders);
     }
 
     @PostMapping("/work-orders")
@@ -126,7 +131,7 @@ public class ScenarioController {
         if (!List.of("immediate", "reduced", "tomorrow").contains(request.plan())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown intervention plan");
         }
-        String id = "WO-" + nextWorkOrder.getAndIncrement();
+        String id = firestorePersistence.nextWorkOrderId(nextWorkOrder.getAndIncrement());
         WorkOrder order = new WorkOrder(
                 id, "P-101A", "Inspect drive-end bearing and verify alignment",
                 request.plan(), request.window(), "BRG-6208", 1, "Rotating equipment", 2.5,
@@ -134,6 +139,7 @@ public class ScenarioController {
                 "DRAFT", List.of("Maintenance supervisor", "Area authority"),
                 request.technicianObservation(), Instant.now());
         workOrders.add(order);
+        firestorePersistence.saveWorkOrder(order);
         return order;
     }
 
@@ -148,6 +154,7 @@ public class ScenarioController {
                         wo.safetyChecks(), "COMPLETED", wo.requiredApprovals(),
                         req.actualFinding(), wo.createdAt());
                 workOrders.set(i, closed);
+                firestorePersistence.saveWorkOrder(closed);
                 return closed;
             }
         }
@@ -168,6 +175,17 @@ public class ScenarioController {
 
     @PostMapping("/copilot")
     public CopilotResponse copilot(@RequestBody CopilotRequest req) {
+        if (geminiService.isConfigured()) {
+            try {
+                String answer = geminiService.answer(req.question(), req.context());
+                return new CopilotResponse(answer,
+                        List.of("Gemini 2.5 Flash · Google AI Studio"),
+                        "AI-generated · verify before operational action", Instant.now());
+            } catch (RuntimeException ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                        "AI assistance is temporarily unavailable");
+            }
+        }
         String q = req.question() == null ? "" : req.question().toLowerCase();
 
         if (q.contains("pressure") || q.contains("bar") || q.contains("9 bar") || q.contains("7 bar") || q.contains("baseline")) {
