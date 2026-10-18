@@ -190,7 +190,7 @@ function LiveSensorPanel({ live, history, liveAge, flash }: {
 function CopilotPanel({ isOpen, messages, loading, input, onInputChange, onSend, onSuggest, onClose, endRef }: {
   isOpen: boolean; messages: CopilotMsg[]; loading: boolean; input: string;
   onInputChange: (v: string) => void; onSend: () => void; onSuggest: (q: string) => void;
-  onClose: () => void; endRef: React.RefObject<HTMLDivElement | null>
+  onClose: () => void; endRef: React.RefObject<HTMLDivElement>
 }) {
   if (!isOpen) return null
   return (
