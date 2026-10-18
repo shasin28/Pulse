@@ -3,8 +3,9 @@
   "private": true,
   "workspaces": ["apps/web"],
   "scripts": {
-    "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev": "concurrently -k -n api,web,mobile -c yellow,cyan,magenta \"npm:dev:api\" \"npm:dev:web\" \"npm:dev:mobile\"",
     "dev:web": "npm run dev --workspace @pulse/web",
+    "dev:mobile": "npm run dev --prefix PulseMobile",
     "dev:api": "mvn -s .mvn/settings.xml -f services/api/pom.xml spring-boot:run",
     "build": "npm run build --workspace @pulse/web"
   },

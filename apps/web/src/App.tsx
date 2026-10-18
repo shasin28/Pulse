@@ -11,6 +11,7 @@ import {
   Area, CartesianGrid, ComposedChart, Line, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
+import { QRCodeSVG } from 'qrcode.react'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type NavItem = 'Overview' | 'Assets' | 'Alerts' | 'Work orders'
@@ -599,7 +600,27 @@ function App() {
 
           <article className={`workflow-panel workorder-panel ${workOrderCreated ? 'workorder-ready' : ''}`}>
             <div className="panel-heading"><div className="step-number">03</div><div><span className="panel-kicker">READY FOR REVIEW</span><h3>{workOrderCreated ? 'Work order drafted' : 'Prepare work order'}</h3></div>{workOrderCreated && <span className="draft-badge">DRAFT</span>}</div>
-            {workOrderCreated ? <div className="created-order"><div className="order-confirm-icon"><CheckCircle2 size={18} /></div><div><strong>{workOrderId} · P-101A bearing inspection</strong><small>{createdWindow} · Awaiting supervisor review</small></div><button className="icon-button" onClick={() => setActiveNav('Work orders')}><ArrowRight size={17} /></button></div> : <p className="panel-description">Scope, parts, isolation checks, and approvals in one review-ready draft.</p>}
+            {workOrderCreated ? (
+              <>
+                <div className="created-order"><div className="order-confirm-icon"><CheckCircle2 size={18} /></div><div><strong>{workOrderId} · P-101A bearing inspection</strong><small>{createdWindow} · Awaiting supervisor review</small></div><button className="icon-button" onClick={() => setActiveNav('Work orders')}><ArrowRight size={17} /></button></div>
+                <div className="field-handoff">
+                  <div className="field-handoff-text">
+                    <span className="field-handoff-label">FIELD TECHNICIAN</span>
+                    <strong>Open in Pulse Field</strong>
+                    <small>Scan to open the inspection app on your phone</small>
+                  </div>
+                  <div className="field-qr">
+                    <QRCodeSVG
+                      value={`http://${window.location.hostname}:5174`}
+                      size={72}
+                      bgColor="transparent"
+                      fgColor="#364037"
+                      level="M"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : <p className="panel-description">Scope, parts, isolation checks, and approvals in one review-ready draft.</p>}
             <div className="workorder-summary">
               <div><span><Wrench size={14} /> TASK</span><strong>Inspect drive-end bearing &amp; verify alignment</strong></div>
               <div><span><Package size={14} /> PARTS RESERVED</span><strong>BRG-6208 × 1 <i>In stock</i></strong></div>
